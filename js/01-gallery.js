@@ -18,36 +18,39 @@ galleryEl.insertAdjacentHTML("afterbegin", galleryItemsList);
 
 galleryEl.addEventListener("click", galleryClick);
 
+
 let instance;
-function onKeyboardClick(event) {
-      if (event.code === 'Escape') { 
-          instance.close();
-          // window.removeEventListener('keydown', onKeyboardClick);
-        };
-    };
+
+function onEscClick(event) {
+  if (event.keyCode === 27) {
+    instance.close();
+    return;
+  }
+}
 
 function galleryClick(event) {
-    event.preventDefault();
-    instance = basicLightbox.create(`
-  <div class="modal">
-  <img src="${event.target.dataset.source}" class="js-modal-img" width="800" height="600">
-  </div>
-`, {
-      onShow: (instance) => {
-    window.addEventListener("keydown", onKeyboardClick);
-    instance.element().querySelector('.js-modal-img').addEventListener("click", () => {
-      instance.close();
-    });
-      },
-      onClose: (instance) => {
-        
-        if (event.code === 'Escape') {
-          window.removeEventListener('keydown', onKeyboardClick);
-          instance.close();
-        }
-
+  event.preventDefault();
+  if (event.target.nodeName !== 'IMG') {
+    return;
   }
-    }).show();
-  
+  instance = basicLightbox.create(
+    `<img class="modal-img" src="">`,
+    {
+      onShow: () => {
+        window.addEventListener('keydown', onEscClick);
+      },
+    },
+    {
+      onClose: () => {
+        window.removeEventListener('keydown', onEscClick);
+      },
+    },
+  );
+  instance.element().querySelector('.modal-img').src =
+    event.target.dataset.source;
+
+  instance.show();
 }
-console.log(galleryItemsList);
+
+
+
